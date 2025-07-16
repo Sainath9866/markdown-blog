@@ -57,8 +57,8 @@ export default function Home() {
             <div>
               {
                 posts.map((post) => (
-                  <div className="mx-[250px] my-[30px]">
-                    <Postcard key={post.id} post={post}/>
+                  <div key={post.id} className="mx-[250px] my-[30px]">
+                    <Postcard post={post} />
                   </div>
                 ))
               }
