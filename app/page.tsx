@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import AuthButton from "@/components/AuthButton";
 import Loader from "@/components/ui/Loader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { dummyPosts } from "@/dummpy-posts";
 import Postcard from "@/components/post-card";
 
@@ -24,12 +24,28 @@ interface post {
 }
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(false);
-  const posts = dummyPosts;
-  //const [posts, setPosts] = useState<post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  //const posts = dummyPosts;
+  const [posts, setPosts] = useState<post[]>([]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [])
+
+   const fetchPosts = async () => {
+    try {
+      const response = await fetch("/api/posts");
+      const data = await response.json();
+      setPosts(data);
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className=" min-h-screen ">
-      <header className="border-1 shadow-lg ">
+      <header className=" shadow-lg ">
         <div className="container flex justify-between p-4 items-center">
           <div className="text-4xl font-bold ml-[100px]">
             Simple Blog
@@ -52,12 +68,19 @@ export default function Home() {
         </div>
         {
           isLoading ? (
-            <Loader />
+            <div>
+              <div className="flex items-center mt-24">
+                <Loader />
+              </div>
+              <div className="text-center mt-3">
+                Fetching posts...
+              </div>
+            </div>
           ) : (
             <div>
               {
                 posts.map((post) => (
-                  <div key={post.id} className="mx-[250px] my-[30px]">
+                  <div key={post.id} className="mx-[300px] my-[30px]">
                     <Postcard post={post} />
                   </div>
                 ))

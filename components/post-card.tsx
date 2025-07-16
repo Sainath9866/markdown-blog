@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Card,
     CardAction,
@@ -13,8 +13,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Heart, MessageCircle } from 'lucide-react';
-import {format} from 'date-fns'
-
+import { format } from 'date-fns'
+import MarkdownRenderer from './markdown-renderer';
+import { useSession } from 'next-auth/react';
+import { useEffect } from 'react';
 interface Post {
     id: string;
     title: string;
@@ -30,8 +32,48 @@ interface Post {
     };
 }
 export default function Postcard({ post, showfullContent = false }: { post: Post, showfullContent?: boolean }) {
-    const liked = true;
-    const likeloading = false;
+    const { data: session } = useSession()
+    const [liked, setLiked] = useState(false);
+    const [likecount, setLikecount] = useState(post._count.likes)
+    const [likeloading, setLikeLoading] = useState(false);
+    const content = post.content.slice(0, 200) + (post.content.length > 200 ? "..." : "")
+    useEffect(() => {
+        const fetchLikeStatus = async () => {
+            if (!session?.user?.id) {
+                setLikeLoading(false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/posts/${post.id}/like-status`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data)
+                    setLiked(data.liked);
+                }
+            } catch (error) {
+                console.log("Failed to fetch like status:", error);
+            } finally {
+                setLikeLoading(false);
+            }
+        };
+
+        fetchLikeStatus();
+    }, [post.id, session?.user?.id]);
+
+    const handleLike = async () => {
+        if (!session) return;
+        try {
+            const response = await fetch(`api/posts/${post.id}/like`, {
+                method: "POST"
+            })
+            const data = await response.json();
+            setLiked(data.liked);
+            setLikecount((prev) => (data.liked ? prev + 1 : prev - 1))
+        } catch (error) {
+            console.error("Failed to update the likes", error)
+        }
+    }
     return (
         <div>
             <Card>
@@ -61,18 +103,17 @@ export default function Postcard({ post, showfullContent = false }: { post: Post
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p>{post.content}</p>
+                    <MarkdownRenderer content={content} />
                 </CardContent>
                 <CardFooter className='flex items-center space-x-4'>
-                    <Button variant={"ghost"}>
+                    <Button onClick={handleLike} variant={"ghost"}>
                         <Heart className={`h-4 w-4 ${likeloading ? "animate-pulse" : liked ? "fill-red-500 text-red-500" : ""}`} />
-                        <div>10</div>
+                        <div>{likecount}</div>
                     </Button>
                     <Button variant={"ghost"}>
                         <MessageCircle className='h-4 w-4'></MessageCircle>
-                        <div>20</div>
+                        <div>{post._count.comments}</div>
                     </Button>
-
                 </CardFooter>
             </Card>
         </div>
