@@ -1,0 +1,260 @@
+# 🚀 Getting Started with Prisma + PostgreSQL + FastAPI
+
+This guide walks you through setting up a FastAPI application using Prisma ORM with a PostgreSQL database.
+
+---
+
+## 📦 1. Create a FastAPI Project
+
+First, create a new directory and set up a Python virtual environment:
+
+```bash
+mkdir fastapi-prisma-app
+cd fastapi-prisma-app
+python -m venv venv
+# On Windows
+.\venv\Scripts\activate
+# On Unix or MacOS
+source venv/bin/activate
+```
+
+Install FastAPI and dependencies:
+
+```bash
+pip install fastapi uvicorn[standard] python-dotenv
+```
+
+📘 [FastAPI Documentation](https://fastapi.tiangolo.com/)
+
+---
+
+## 🔧 2. Install Prisma and Dependencies
+
+Install the Prisma CLI globally using npm (requires Node.js):
+
+```bash
+npm install -g prisma
+```
+
+Install the Prisma Client Python:
+
+```bash
+pip install prisma
+```
+
+📘 [Prisma Python Client](https://prisma-client-py.readthedocs.io/)
+
+---
+
+## 🧪 3. Initialize Prisma
+
+Initialize Prisma in your project:
+
+```bash
+prisma init
+```
+
+This will create:
+
+- `prisma/schema.prisma`: where you define your data model
+- `.env`: for storing your PostgreSQL connection string
+
+📘 [Prisma CLI Docs](https://www.prisma.io/docs/reference/api-reference/command-reference#init)
+
+---
+
+## 🗃️ 4. Configure PostgreSQL Connection
+
+Open the `.env` file and update the `DATABASE_URL`:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/DATABASE_NAME?schema=public"
+```
+
+Replace `USER`, `PASSWORD`, and `DATABASE_NAME` with your actual PostgreSQL credentials.
+
+You can use local PostgreSQL or services like:
+
+- [Supabase](https://supabase.com/)
+- [Railway](https://railway.app/)
+- [Neon](https://neon.tech/)
+- [Render](https://render.com/)
+
+📘 [Connection URL Guide](https://www.prisma.io/docs/reference/database-reference/connection-urls)
+
+---
+
+## ✍️ 5. Define Your Data Model
+
+Edit `prisma/schema.prisma` and add a sample model:
+
+```prisma
+generator client {
+  provider             = "prisma-client-py"
+  interface           = "asyncio"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
+```
+
+📘 [Prisma Data Model Docs](https://www.prisma.io/docs/concepts/components/prisma-schema)
+
+---
+
+## ⚙️ 6. Push Schema to Database
+
+Push your schema to the database:
+
+```bash
+prisma db push
+```
+
+This creates the necessary tables.
+
+📘 [db push command](https://www.prisma.io/docs/reference/api-reference/command-reference#db-push)
+
+---
+
+## 🔄 7. Generate Prisma Client
+
+Generate the Prisma Client:
+
+```bash
+prisma generate
+```
+
+📘 [Prisma Client Docs](https://prisma-client-py.readthedocs.io/getting_started/setup/)
+
+---
+
+## 📂 8. Create FastAPI Application Structure
+
+Create the following files:
+
+`main.py`:
+```python
+from fastapi import FastAPI
+from prisma import Prisma
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    prisma = Prisma()
+    await prisma.connect()
+    yield
+    await prisma.disconnect()
+
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+```
+
+---
+
+## 🧪 9. Create API Routes
+
+Create `routes/posts.py`:
+
+```python
+from fastapi import APIRouter, HTTPException
+from prisma import Prisma
+from pydantic import BaseModel
+from typing import List
+
+router = APIRouter()
+prisma = Prisma()
+
+class PostCreate(BaseModel):
+    title: str
+    content: str
+
+class Post(PostCreate):
+    id: str
+    createdAt: str
+
+@router.get("/posts", response_model=List[Post])
+async def get_posts():
+    return await prisma.post.find_many()
+
+@router.post("/posts", response_model=Post)
+async def create_post(post: PostCreate):
+    return await prisma.post.create(
+        data={
+            'title': post.title,
+            'content': post.content
+        }
+    )
+```
+
+Update `main.py` to include the router:
+
+```python
+from fastapi import FastAPI
+from routes import posts
+
+app = FastAPI()
+app.include_router(posts.router)
+```
+
+---
+
+## 🚀 10. Run the Application
+
+Start the FastAPI server:
+
+```bash
+uvicorn main:app --reload
+```
+
+Visit http://localhost:8000/docs for the Swagger UI documentation.
+
+---
+
+## 🧼 11. Explore Your Data with Prisma Studio
+
+```bash
+prisma studio
+```
+
+It opens a visual editor in your browser.
+
+📘 [Prisma Studio](https://www.prisma.io/studio)
+
+---
+
+## ✅ You're All Set!
+
+You now have a FastAPI project connected to a PostgreSQL database using Prisma. You can build full-featured APIs with:
+
+- Async database queries
+- Type-safe database access
+- Automatic OpenAPI documentation
+- Dependency injection
+- And more!
+
+---
+
+## 📚 Resources
+
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Prisma Python Client](https://prisma-client-py.readthedocs.io/)
+- [PostgreSQL Docs](https://www.postgresql.org/docs/)
+- [Pydantic Documentation](https://docs.pydantic.dev/)
+- [Supabase](https://supabase.com/)
+- [Neon](https://neon.tech/)
+- [Railway](https://railway.app/)
+
+--- 
