@@ -4,12 +4,15 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 import { Button } from "./ui/button";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { User } from "lucide-react";
+import Link from "next/link";
 export default function AuthButton() {
     const { data: session, status } = useSession();
 
@@ -51,6 +54,13 @@ export default function AuthButton() {
                             {session.user?.email}
                         </p>
                     </div>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" asChild>
+                    <Link href="/my-posts">
+                        <User className="mr-2 h-4 w-4" />
+                        My Posts
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer" onClick={() => signOut()}>Sign out</DropdownMenuItem>
             </DropdownMenuContent>

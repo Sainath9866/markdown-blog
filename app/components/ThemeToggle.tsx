@@ -28,19 +28,6 @@ const MoonIcon = () => (
   </svg>
 )
 
-const SystemIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <rect x="2" y="4" width="20" height="16" rx="2" />
-    <path d="M6 8h4M6 12h8M6 16h6" />
-  </svg>
-)
-
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
@@ -59,48 +46,35 @@ export function ThemeToggle() {
   const handleThemeChange = () => {
     if (theme === 'light') {
       setTheme('dark')
-    } else if (theme === 'dark') {
-      setTheme('system')
     } else {
       setTheme('light')
     }
   }
 
   const getIcon = () => {
-    switch (theme) {
-      case 'light':
-        return <SunIcon />
-      case 'dark':
-        return <MoonIcon />
-      default:
-        return <SystemIcon />
+    if (theme === 'light') {
+      return <SunIcon />
+    } else {
+      return <MoonIcon />
     }
   }
 
   const getTooltip = () => {
-    switch (theme) {
-      case 'light':
-        return 'Switch to dark mode'
-      case 'dark':
-        return 'Switch to system mode'
-      default:
-        return 'Switch to light mode'
+    if (theme === 'light') {
+      return 'Switch to dark mode'
+    } else {
+      return 'Switch to light mode'
     }
   }
 
   return (
-    <div>
-      <button
-        onClick={handleThemeChange}
-        className="relative inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-        title={getTooltip()}
-        aria-label={getTooltip()}
-      >
-        {getIcon()}
-      </button>
-      <div className="text-sm text-gray-800 dark:text-gray-400">
-        {getTooltip()}
-      </div>
-    </div>
+    <button
+      onClick={handleThemeChange}
+      className="relative inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+      title={getTooltip()}
+      aria-label={getTooltip()}
+    >
+      {getIcon()}
+    </button>
   )
 } 

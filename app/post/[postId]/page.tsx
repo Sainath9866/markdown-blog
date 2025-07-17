@@ -13,6 +13,7 @@ interface Post {
   title: string;
   content: string;
   createdAt: string;
+  authorId: string;
   author: {
     name: string | null;
     image: string | null;
@@ -32,11 +33,10 @@ export default function PostPage() {
     if (params.postId) {
       fetchPost(params.postId as string);
     }
-  }, [params.id]);
+  }, [params.postId]);
 
   const fetchPost = async (id: string) => {
     try {
-        console.log(id)
       const response = await fetch(`/api/posts/${id}`);
       if (response.ok) {
         const data = await response.json();
@@ -79,7 +79,7 @@ export default function PostPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
+      <header className="border-b shadow-lg dark:shadow-white/20">
         <div className="container mx-auto px-4 py-4">
           <Button variant="ghost" asChild>
             <Link href="/">
@@ -97,5 +97,6 @@ export default function PostPage() {
         </div>
       </main>
     </div>
+    
   );
 }

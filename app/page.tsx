@@ -4,8 +4,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import AuthButton from "@/components/AuthButton";
 import Loader from "@/components/ui/Loader";
+import { ThemeToggle } from "./components/ThemeToggle";
 import { useEffect, useState } from "react";
-import { dummyPosts } from "@/dummpy-posts";
+
 import Postcard from "@/components/post-card";
 
 interface post {
@@ -13,6 +14,7 @@ interface post {
   title: string;
   content: string;
   createdAt: string;
+  authorId: string;
   author: {
     name: string | null;
     image: string | null;
@@ -45,12 +47,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <header className="shadow-lg">
+      <header className="shadow-lg dark:shadow-white/20">
         <div className="container flex justify-between p-4 items-center">
           <div className="text-2xl sm:text-4xl font-bold ml-2 sm:ml-[100px]">
             Simple Blog
           </div>
           <div className="flex items-center mr-2 sm:mr-[100px] space-x-2">
+            <ThemeToggle />
             <Button className="cursor-pointer">
               <Link href="/create" className="flex items-center">
                 <PlusCircle className="h-4 w-4 mt-0.5" />

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getCurrentUser } from "@/lib/utils/auth"
 import { prisma } from "@/lib/prisma"
 
-export async function POST(request: NextRequest, { params }: { params: { postId: string }}) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ postId: string }> }) {
     const user = await getCurrentUser()
     const { postId } = await params
     if(!user) return NextResponse.json({error : "Please sign in"})

@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Card, CardContent } from "./ui/card";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 interface Comment {
   id: string;
@@ -25,9 +25,9 @@ export default function CommentSection({ postId }: { postId: string }) {
 
   useEffect(() => {
     fetchComments();
-  }, [postId]);
+  }, [fetchComments]);
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const response = await fetch(`/api/posts/${postId}/comments`);
       const data = await response.json();
@@ -35,7 +35,7 @@ export default function CommentSection({ postId }: { postId: string }) {
     } catch (error) {
       console.error("Failed to fetch comments:", error);
     }
-  };
+  }, [postId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

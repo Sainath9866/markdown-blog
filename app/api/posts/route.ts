@@ -4,7 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
     try {
         const posts = await prisma.post.findMany({
-            include: {
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                createdAt: true,
+                authorId: true,
                 author: {
                     select: { name: true, image: true },
                 },
