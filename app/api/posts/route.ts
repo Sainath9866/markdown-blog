@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/utils/auth";
 import { NextRequest, NextResponse } from "next/server";
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         const posts = await prisma.post.findMany({
             select: {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
             },
         })
         return NextResponse.json(post)
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Failed to create post" }, { status: 500 })
     }
 

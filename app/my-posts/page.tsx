@@ -96,7 +96,7 @@ export default function MyPostsPage() {
               <div className="text-center py-12">
                 <h2 className="text-xl font-semibold mb-4">No posts yet</h2>
                 <p className="text-muted-foreground mb-6">
-                  You haven't created any posts yet. Start sharing your thoughts!
+                  You have not created any posts yet. Start sharing your thoughts!
                 </p>
                 <Button asChild>
                   <Link href="/create">Create Your First Post</Link>
