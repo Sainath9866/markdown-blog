@@ -17,6 +17,7 @@ import { format } from 'date-fns'
 import MarkdownRenderer from './markdown-renderer';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
+import { useRouter } from "next/navigation";
 interface Post {
     id: string;
     title: string;
@@ -31,12 +32,13 @@ interface Post {
         likes: number;
     };
 }
-export default function Postcard({ post, showfullContent = false }: { post: Post, showfullContent?: boolean }) {
+export default function Postcard({ post, showfullContent }: { post: Post, showfullContent?: boolean }) {
     const { data: session } = useSession()
     const [liked, setLiked] = useState(false);
     const [likecount, setLikecount] = useState(post._count.likes)
     const [likeloading, setLikeLoading] = useState(false);
-    const content = post.content.slice(0, 200) + (post.content.length > 200 ? "..." : "")
+    const content = showfullContent? post.content : post.content.slice(0, 200) + (post.content.length > 200 ? "..." : "")
+    const router = useRouter()
     useEffect(() => {
         const fetchLikeStatus = async () => {
             if (!session?.user?.id) {
@@ -95,7 +97,7 @@ export default function Postcard({ post, showfullContent = false }: { post: Post
                             showfullContent ? (
                                 post.title
                             ) : (
-                                <Link href={`posts/${post.id}`} className='hover:underline'>
+                                <Link href={`post/${post.id}`} className='hover:underline'>
                                     {post.title}
                                 </Link>
                             )
@@ -106,11 +108,11 @@ export default function Postcard({ post, showfullContent = false }: { post: Post
                     <MarkdownRenderer content={content} />
                 </CardContent>
                 <CardFooter className='flex items-center space-x-4'>
-                    <Button onClick={handleLike} variant={"ghost"}>
+                    <Button className='cursor-pointer' onClick={handleLike} variant={"ghost"}>
                         <Heart className={`h-4 w-4 ${likeloading ? "animate-pulse" : liked ? "fill-red-500 text-red-500" : ""}`} />
                         <div>{likecount}</div>
                     </Button>
-                    <Button variant={"ghost"}>
+                    <Button className='cursor-pointer' onClick={() => router.push(`/post/${post.id}`)} variant={"ghost"}>
                         <MessageCircle className='h-4 w-4'></MessageCircle>
                         <div>{post._count.comments}</div>
                     </Button>
